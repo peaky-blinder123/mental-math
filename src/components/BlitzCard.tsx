@@ -290,7 +290,7 @@ export default function BlitzCard() {
   };
 
   const handleConfigChange = (key: keyof TablesConfig, val: number) => {
-    if (isNaN(val) || val < 1) return;
+    if (key !== 'only12to20' && (isNaN(val) || val < 1)) return;
     setTablesConfig(prev => {
       const next = { ...prev, [key]: val };
       if (key === 'minTable' && next.minTable > next.maxTable) next.maxTable = next.minTable;
