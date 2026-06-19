@@ -76,10 +76,47 @@ export default function BlitzCard() {
   // Game running states
   const [problem, setProblem] = useState<Problem | null>(null);
   const [typedValue, setTypedValue] = useState<string>('');
-  const [timeLeft, setTimeLeft] = useState<number>(30); // 30s pool
+  const [timeLeft, setTimeLeft] = useState<number>(30);
   const [score, setScore] = useState<number>(0);
   const [attemptsCount, setAttemptsCount] = useState<number>(0);
   const [inputStatus, setInputStatus] = useState<'idle' | 'success' | 'error'>('idle');
+
+  // Blitz Custom Timing Configurations
+  const [initialTime, setInitialTime] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('mm_blitz_initial_time');
+      return saved ? Number(saved) : 30;
+    }
+    return 30;
+  });
+  const [timeBonus, setTimeBonus] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('mm_blitz_time_bonus');
+      return saved ? Number(saved) : 3;
+    }
+    return 3;
+  });
+  const [timePenalty, setTimePenalty] = useState<number>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('mm_blitz_time_penalty');
+      return saved ? Number(saved) : 5;
+    }
+    return 5;
+  });
+
+  const handleBlitzTimeChange = (key: 'initial' | 'bonus' | 'penalty', val: number) => {
+    if (isNaN(val) || val < 0) return;
+    if (key === 'initial') {
+      setInitialTime(val);
+      localStorage.setItem('mm_blitz_initial_time', String(val));
+    } else if (key === 'bonus') {
+      setTimeBonus(val);
+      localStorage.setItem('mm_blitz_time_bonus', String(val));
+    } else if (key === 'penalty') {
+      setTimePenalty(val);
+      localStorage.setItem('mm_blitz_time_penalty', String(val));
+    }
+  };
 
   // History for gameover review
   const [attemptsList, setAttemptsList] = useState<SessionAttempt[]>([]);
@@ -129,7 +166,7 @@ export default function BlitzCard() {
   const startGame = () => {
     setScore(0);
     setAttemptsCount(0);
-    setTimeLeft(30);
+    setTimeLeft(initialTime);
     setAttemptsList([]);
     setTypedValue('');
     setInputStatus('idle');
@@ -238,8 +275,8 @@ export default function BlitzCard() {
         }
       ]);
 
-      // Add time back (+3s), max capped at 60s
-      setTimeLeft(prev => Math.min(60, prev + 3));
+      // Add time back (+timeBonus), max capped at Math.max(60, initialTime * 2)
+      setTimeLeft(prev => Math.min(Math.max(60, initialTime * 2), prev + timeBonus));
 
       // Advance immediately
       loadNewProblem(selectedStrategy);
@@ -259,8 +296,8 @@ export default function BlitzCard() {
         }
       ]);
 
-      // Deduct time penalty (-5s)
-      setTimeLeft(prev => Math.max(0, prev - 5));
+      // Deduct time penalty (-timePenalty)
+      setTimeLeft(prev => Math.max(0, prev - timePenalty));
 
       // Short flash and advance instantly (no halting for Blitz!)
       setTimeout(() => {
@@ -674,12 +711,65 @@ export default function BlitzCard() {
           <div className="w-full max-w-md bg-canvas border border-border-hairline p-6 rounded-xl shadow-vercel-lg flex flex-col gap-4 text-center">
             <h4 className="text-sm font-bold text-ink">Blitz Rules</h4>
             <ul className="text-xs text-body-text text-left list-disc list-inside flex flex-col gap-2.5">
-              <li>You start with a <span className="font-semibold text-link-blue">30 second</span> time pool.</li>
-              <li>Correct answers grant <span className="font-semibold text-success-green">+3 seconds</span>.</li>
-              <li>Incorrect answers deduct <span className="font-semibold text-error-red">-5 seconds</span>.</li>
+              <li>You start with a <span className="font-semibold text-link-blue">{initialTime} second{initialTime !== 1 ? 's' : ''}</span> time pool.</li>
+              <li>Correct answers grant <span className="font-semibold text-success-green">+{timeBonus} second{timeBonus !== 1 ? 's' : ''}</span>.</li>
+              <li>Incorrect answers deduct <span className="font-semibold text-error-red">-{timePenalty} second{timePenalty !== 1 ? 's' : ''}</span>.</li>
               <li>Type directly using the numpad or your keyboard to submit.</li>
               <li>Get as many points as you can before the clock hits zero!</li>
             </ul>
+
+            {/* Custom Timing Controls */}
+            <div className="flex flex-col gap-3.5 border-t border-border-hairline pt-4 text-left">
+              <h5 className="text-[11px] font-bold text-muted-text uppercase tracking-wider mb-1">Customize Timer</h5>
+              
+              <div className="flex flex-col gap-1">
+                <div className="flex justify-between text-xs font-mono text-body-text">
+                  <span>Initial Time Pool:</span>
+                  <span className="font-bold text-ink">{initialTime}s</span>
+                </div>
+                <input
+                  type="range"
+                  min="5"
+                  max="120"
+                  step="5"
+                  value={initialTime}
+                  onChange={e => handleBlitzTimeChange('initial', Number(e.target.value))}
+                  className="w-full h-1 bg-canvas-soft-2 rounded-lg appearance-none cursor-pointer accent-link-blue"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1 mt-1">
+                <div className="flex justify-between text-xs font-mono text-body-text">
+                  <span>Success Bonus:</span>
+                  <span className="font-bold text-ink">+{timeBonus}s</span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="15"
+                  step="1"
+                  value={timeBonus}
+                  onChange={e => handleBlitzTimeChange('bonus', Number(e.target.value))}
+                  className="w-full h-1 bg-canvas-soft-2 rounded-lg appearance-none cursor-pointer accent-link-blue"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1 mt-1">
+                <div className="flex justify-between text-xs font-mono text-body-text">
+                  <span>Penalty:</span>
+                  <span className="font-bold text-ink">-{timePenalty}s</span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="15"
+                  step="1"
+                  value={timePenalty}
+                  onChange={e => handleBlitzTimeChange('penalty', Number(e.target.value))}
+                  className="w-full h-1 bg-canvas-soft-2 rounded-lg appearance-none cursor-pointer accent-link-blue"
+                />
+              </div>
+            </div>
 
             <button
               onClick={startGame}
@@ -702,7 +792,13 @@ export default function BlitzCard() {
             </span>
             <span 
               className="font-bold text-sm tracking-tight transition-colors duration-300"
-              style={{ color: timeLeft > 15 ? 'var(--color-success-green)' : timeLeft > 6 ? 'var(--color-warning-orange)' : 'var(--color-error-red)' }}
+              style={{ 
+                color: timeLeft > Math.min(15, initialTime * 0.5) 
+                  ? 'var(--color-success-green)' 
+                  : timeLeft > Math.min(6, initialTime * 0.2) 
+                    ? 'var(--color-warning-orange)' 
+                    : 'var(--color-error-red)' 
+              }}
             >
               Time: {timeLeft}s
             </span>
@@ -713,8 +809,12 @@ export default function BlitzCard() {
             <div 
               className="h-full transition-all duration-1000 ease-linear"
               style={{ 
-                width: `${(timeLeft / 60) * 100}%`,
-                backgroundColor: timeLeft > 15 ? 'var(--color-success-green)' : timeLeft > 6 ? 'var(--color-warning-orange)' : 'var(--color-error-red)'
+                width: `${Math.min(100, (timeLeft / Math.max(60, initialTime * 2)) * 100)}%`,
+                backgroundColor: timeLeft > Math.min(15, initialTime * 0.5) 
+                  ? 'var(--color-success-green)' 
+                  : timeLeft > Math.min(6, initialTime * 0.2) 
+                    ? 'var(--color-warning-orange)' 
+                    : 'var(--color-error-red)'
               }}
             />
           </div>
