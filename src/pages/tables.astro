@@ -1,0 +1,20 @@
+---
+import Layout from '../layouts/Layout.astro';
+import TablesLearningCard from '../components/TablesLearningCard';
+---
+
+<Layout 
+	title="Times Tables Learning | mental mathit" 
+	description="Explore times tables 12-20. Select individual equations to view worked mental strategy steps, or launch targeted row drills."
+>
+	<div class="text-center max-w-lg mx-auto mb-10">
+		<h1 class="font-sans text-3xl md:text-5xl font-extrabold tracking-[-0.03em] leading-tight text-ink mb-2 text-balance">
+			Times Tables.
+		</h1>
+		<p class="text-xs text-muted-text max-w-sm mx-auto leading-relaxed">
+			Learn 12-20 multiplication structures interactively. Audit products, read explanations, and practice specific rows.
+		</p>
+	</div>
+
+	<TablesLearningCard client:load />
+</Layout>

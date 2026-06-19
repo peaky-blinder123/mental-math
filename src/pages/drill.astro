@@ -1,0 +1,20 @@
+---
+import Layout from '../layouts/Layout.astro';
+import DrillCard from '../components/DrillCard';
+---
+
+<Layout 
+	title="Typing Drill | mental mathit" 
+	description="Type exact answers to math questions. Correct values auto-advance; errors halt to explain strategic breakdowns."
+>
+	<div class="text-center max-w-lg mx-auto mb-10">
+		<h1 class="font-sans text-3xl md:text-5xl font-extrabold tracking-[-0.03em] leading-tight text-ink mb-2 text-balance">
+			Typing Drill.
+		</h1>
+		<p class="text-xs text-muted-text max-w-sm mx-auto leading-relaxed">
+			Build exact recall. Correct inputs auto-advance. Incorrect answers halt to explain calculations.
+		</p>
+	</div>
+
+	<DrillCard client:load />
+</Layout>

@@ -1,11 +1,145 @@
 ---
-import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
-
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
 ---
 
 <Layout>
-	<Welcome />
+	<!-- Hero Section -->
+	<section class="text-center py-16 md:py-24 max-w-3xl mx-auto flex flex-col items-center">
+		<!-- Sparkle Banner -->
+		<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border-hairline bg-canvas-soft-2 text-[11px] font-medium tracking-tight text-body-text mb-6 shadow-vercel-sm animate-pulse">
+			<span class="w-1.5 h-1.5 rounded-full bg-link-blue"></span>
+			Introducing the ultimate focus tool
+		</div>
+		
+		<!-- Large sentence-case period-terminated title -->
+		<h1 class="font-sans text-5xl md:text-7xl font-extrabold tracking-[-0.04em] leading-[1.05] text-ink mb-6 text-balance">
+			Train your head.<br />Master mental math.
+		</h1>
+		
+		<p class="text-sm md:text-base font-normal text-body-text max-w-lg leading-relaxed mb-8">
+			Master basic addition, subtraction, and advanced times tables using targeted cognitive strategies. Built for speed, precision, and focus.
+		</p>
+		
+		<div class="flex flex-wrap items-center justify-center gap-3.5">
+			<a 
+				href="/sandbox" 
+				class="cursor-pointer px-6 py-2.5 bg-ink text-canvas hover:bg-ink/90 border border-border-hairline font-semibold rounded-full shadow-vercel-lg hover:shadow-vercel-xl transition-all text-sm"
+			>
+				Start Sandbox
+			</a>
+			<a 
+				href="/drill" 
+				class="cursor-pointer px-6 py-2.5 bg-canvas hover:bg-canvas-soft-2 border border-border-hairline font-semibold rounded-full shadow-vercel-sm hover:shadow-vercel-md transition-all text-sm text-body-text hover:text-ink"
+			>
+				Try Drilling
+			</a>
+		</div>
+	</section>
+
+	<!-- Practice Modes Grid (Vercel-like hover cards) -->
+	<section class="w-full mt-10">
+		<h2 class="font-sans text-xs font-bold text-muted-text uppercase tracking-widest text-center mb-8 font-mono">
+			Selected Practice Modes
+		</h2>
+		
+		<div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+			
+			<!-- Sandbox -->
+			<a href="/sandbox" class="group flex flex-col justify-between p-6 bg-canvas border border-border-hairline rounded-xl hover:border-border-hairline-strong shadow-vercel-sm hover:shadow-vercel-md transition-all duration-300 relative overflow-hidden">
+				<div class="absolute inset-0 bg-gradient-to-tr from-link-blue/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+				<div>
+					<span class="font-mono text-[9px] uppercase tracking-wider text-muted-text font-bold block mb-2">Self-Paced</span>
+					<h3 class="text-lg font-bold text-ink group-hover:text-link-blue transition-colors flex items-center gap-1.5">
+						Zen Sandbox
+						<span class="text-xs transition-transform duration-200 group-hover:translate-x-1">→</span>
+					</h3>
+					<p class="text-xs text-body-text leading-relaxed mt-2.5">
+						Practice arithmetic rules with zero pressure. Tap to reveal calculations and step-by-step strategies.
+					</p>
+				</div>
+				<div class="mt-6 font-mono text-[9px] text-muted-text uppercase">No timers · 10 strategies</div>
+			</a>
+
+			<!-- Drill -->
+			<a href="/drill" class="group flex flex-col justify-between p-6 bg-canvas border border-border-hairline rounded-xl hover:border-border-hairline-strong shadow-vercel-sm hover:shadow-vercel-md transition-all duration-300 relative overflow-hidden">
+				<div class="absolute inset-0 bg-gradient-to-tr from-violet-brand/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+				<div>
+					<span class="font-mono text-[9px] uppercase tracking-wider text-muted-text font-bold block mb-2">Interactive Check</span>
+					<h3 class="text-lg font-bold text-ink group-hover:text-violet-brand transition-colors flex items-center gap-1.5">
+						Typing Drill
+						<span class="text-xs transition-transform duration-200 group-hover:translate-x-1">→</span>
+					</h3>
+					<p class="text-xs text-body-text leading-relaxed mt-2.5">
+						Type exact answers using the keypad. Correct values auto-advance; errors show mental pathway breakdowns.
+					</p>
+				</div>
+				<div class="mt-6 font-mono text-[9px] text-muted-text uppercase">Keypad input · auto check</div>
+			</a>
+
+			<!-- Metronome -->
+			<a href="/metronome" class="group flex flex-col justify-between p-6 bg-canvas border border-border-hairline rounded-xl hover:border-border-hairline-strong shadow-vercel-sm hover:shadow-vercel-md transition-all duration-300 relative overflow-hidden">
+				<div class="absolute inset-0 bg-gradient-to-tr from-warning-orange/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+				<div>
+					<span class="font-mono text-[9px] uppercase tracking-wider text-muted-text font-bold block mb-2">Steady Rhythm</span>
+					<h3 class="text-lg font-bold text-ink group-hover:text-warning-orange transition-colors flex items-center gap-1.5">
+						Metronome
+						<span class="text-xs transition-transform duration-200 group-hover:translate-x-1">→</span>
+					</h3>
+					<p class="text-xs text-body-text leading-relaxed mt-2.5">
+						Math problems flash on a fixed beating frequency. Resolve in your head, then report scores at the end.
+					</p>
+				</div>
+				<div class="mt-6 font-mono text-[9px] text-muted-text uppercase">Rhythm clock · audio clicks</div>
+			</a>
+
+			<!-- Blitz -->
+			<a href="/blitz" class="group flex flex-col justify-between p-6 bg-canvas border border-border-hairline rounded-xl hover:border-border-hairline-strong shadow-vercel-sm hover:shadow-vercel-md transition-all duration-300 relative overflow-hidden">
+				<div class="absolute inset-0 bg-gradient-to-tr from-pink-brand/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+				<div>
+					<span class="font-mono text-[9px] uppercase tracking-wider text-muted-text font-bold block mb-2">High Intensity</span>
+					<h3 class="text-lg font-bold text-ink group-hover:text-pink-brand transition-colors flex items-center gap-1.5">
+						Blitz Grid
+						<span class="text-xs transition-transform duration-200 group-hover:translate-x-1">→</span>
+					</h3>
+					<p class="text-xs text-body-text leading-relaxed mt-2.5">
+						Race against the decaying countdown. Correct answers add time, mistakes deduct time. Focus is everything.
+					</p>
+				</div>
+				<div class="mt-6 font-mono text-[9px] text-muted-text uppercase">Score attack · 30s pool</div>
+			</a>
+
+			<!-- Tables -->
+			<a href="/tables" class="group flex flex-col justify-between p-6 bg-canvas border border-border-hairline rounded-xl hover:border-border-hairline-strong shadow-vercel-sm hover:shadow-vercel-md transition-all duration-300 relative overflow-hidden">
+				<div class="absolute inset-0 bg-gradient-to-tr from-cyan-brand/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+				<div>
+					<span class="font-mono text-[9px] uppercase tracking-wider text-muted-text font-bold block mb-2">Grid Explorer</span>
+					<h3 class="text-lg font-bold text-ink group-hover:text-cyan-brand transition-colors flex items-center gap-1.5">
+						Tables Learning
+						<span class="text-xs transition-transform duration-200 group-hover:translate-x-1">→</span>
+					</h3>
+					<p class="text-xs text-body-text leading-relaxed mt-2.5">
+						Visually explore multiplication products for tables 12-20. Launch row-targeted training drills instantly.
+					</p>
+				</div>
+				<div class="mt-6 font-mono text-[9px] text-muted-text uppercase">interactive grid · 12-20</div>
+			</a>
+
+			<!-- Analytics -->
+			<a href="/stats" class="group flex flex-col justify-between p-6 bg-canvas border border-border-hairline rounded-xl hover:border-border-hairline-strong shadow-vercel-sm hover:shadow-vercel-md transition-all duration-300 relative overflow-hidden">
+				<div class="absolute inset-0 bg-gradient-to-tr from-ink/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+				<div>
+					<span class="font-mono text-[9px] uppercase tracking-wider text-muted-text font-bold block mb-2">Historical data</span>
+					<h3 class="text-lg font-bold text-ink group-hover:text-link-blue transition-colors flex items-center gap-1.5">
+						Analytics
+						<span class="text-xs transition-transform duration-200 group-hover:translate-x-1">→</span>
+					</h3>
+					<p class="text-xs text-body-text leading-relaxed mt-2.5">
+						Trace your speed and accuracy metrics over time. Review low-performing hotspots and strategy histories.
+					</p>
+				</div>
+				<div class="mt-6 font-mono text-[9px] text-muted-text uppercase">accuracy charts · hotspots</div>
+			</a>
+
+		</div>
+	</section>
 </Layout>

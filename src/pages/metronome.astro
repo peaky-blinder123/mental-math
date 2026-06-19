@@ -1,0 +1,20 @@
+---
+import Layout from '../layouts/Layout.astro';
+import MetronomeCard from '../components/MetronomeCard';
+---
+
+<Layout 
+	title="Metronome Mode | mental mathit" 
+	description="Practice math under a forced rhythm. Solve problems mentally before the metronome ticks."
+>
+	<div class="text-center max-w-lg mx-auto mb-10">
+		<h1 class="font-sans text-3xl md:text-5xl font-extrabold tracking-[-0.03em] leading-tight text-ink mb-2 text-balance">
+			Metronome Mode.
+		</h1>
+		<p class="text-xs text-muted-text max-w-sm mx-auto leading-relaxed">
+			Build speed by training under a steady tempo. Problems flash on fixed intervals. Resolve them in your head.
+		</p>
+	</div>
+
+	<MetronomeCard client:load />
+</Layout>

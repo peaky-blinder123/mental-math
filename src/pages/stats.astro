@@ -1,0 +1,20 @@
+---
+import Layout from '../layouts/Layout.astro';
+import StatsDashboard from '../components/StatsDashboard';
+---
+
+<Layout 
+	title="Performance Analytics | mental mathit" 
+	description="Trace your response times, success percentages, lowest-performing hotspots, and session statistics curves."
+>
+	<div class="text-center max-w-lg mx-auto mb-10">
+		<h1 class="font-sans text-3xl md:text-5xl font-extrabold tracking-[-0.03em] leading-tight text-ink mb-2 text-balance">
+			Analytics dashboard.
+		</h1>
+		<p class="text-xs text-muted-text max-w-sm mx-auto leading-relaxed">
+			Review response latencies, accuracy stats, and practice recommendations mapped automatically to your history.
+		</p>
+	</div>
+
+	<StatsDashboard client:load />
+</Layout>

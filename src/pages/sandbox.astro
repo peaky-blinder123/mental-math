@@ -1,0 +1,20 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ZenSandboxCard from '../components/ZenSandboxCard';
+---
+
+<Layout 
+	title="Zen Sandbox | mental mathit" 
+	description="Practice your mental arithmetic with no pressure. Reveal the answer and the step-by-step mental strategy when you are ready."
+>
+	<div class="text-center max-w-lg mx-auto mb-10">
+		<h1 class="font-sans text-3xl md:text-5xl font-extrabold tracking-[-0.03em] leading-tight text-ink mb-2 text-balance">
+			Zen Sandbox.
+		</h1>
+		<p class="text-xs text-muted-text max-w-sm mx-auto leading-relaxed">
+			Practice your mental arithmetic at your own pace. Internalize the strategy rules without timers.
+		</p>
+	</div>
+
+	<ZenSandboxCard client:load />
+</Layout>

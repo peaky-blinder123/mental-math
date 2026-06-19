@@ -1,0 +1,20 @@
+---
+import Layout from '../layouts/Layout.astro';
+import BlitzCard from '../components/BlitzCard';
+---
+
+<Layout 
+	title="Blitz Grid | mental mathit" 
+	description="High intensity score attack mode. Correct answers add time; incorrect answers deduct time."
+>
+	<div class="text-center max-w-lg mx-auto mb-10">
+		<h1 class="font-sans text-3xl md:text-5xl font-extrabold tracking-[-0.03em] leading-tight text-ink mb-2 text-balance">
+			Blitz Grid.
+		</h1>
+		<p class="text-xs text-muted-text max-w-sm mx-auto leading-relaxed">
+			A high-intensity score attack. Correct inputs add time; errors deduct time. Keep the rhythm.
+		</p>
+	</div>
+
+	<BlitzCard client:load />
+</Layout>

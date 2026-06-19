@@ -1,23 +1,176 @@
+---
+import '../styles/global.css';
+
+interface Props {
+	title?: string;
+	description?: string;
+}
+
+const { 
+	title = "mental mathit | Vercel-inspired Mental Math Platform", 
+	description = "Master your mental math with customizable subtraction, addition, and multiplication training. Self-paced sandbox and timed game modes." 
+} = Astro.props;
+---
+
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width" />
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Astro Basics</title>
+		
+		<!-- SEO Meta Tags -->
+		<title>{title}</title>
+		<meta name="description" content={description} />
+		<meta property="og:title" content={title} />
+		<meta property="og:description" content={description} />
+		<meta property="og:type" content="website" />
+		
+		<!-- Theme Initialization Script (Avoids Flash of Light Mode) -->
+		<script is:inline>
+			(function () {
+				const savedTheme = localStorage.getItem('theme');
+				if (savedTheme === 'light') {
+					document.documentElement.classList.remove('dark');
+				} else {
+					document.documentElement.classList.add('dark');
+				}
+			})();
+		</script>
 	</head>
-	<body>
-		<slot />
+	<body class="relative flex flex-col min-h-screen bg-canvas-soft text-ink font-sans transition-colors duration-300">
+		
+		<!-- Background Atmospheric Mesh Gradients (Vercel Style) -->
+		<div class="absolute inset-0 overflow-hidden pointer-events-none z-0">
+			<!-- Glow 1 (Cyan/Blue) -->
+			<div class="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] rounded-full bg-cyan-brand/10 dark:bg-link-blue/15 blur-[120px] animate-mesh-1"></div>
+			<!-- Glow 2 (Violet/Pink) -->
+			<div class="absolute bottom-[-10%] right-[-5%] w-[50%] h-[50%] rounded-full bg-violet-brand/10 dark:bg-pink-brand/10 blur-[130px] animate-mesh-2"></div>
+		</div>
+
+		<!-- Nav Bar Component -->
+		<header class="sticky top-0 z-50 w-full border-b border-border-hairline bg-canvas/70 glass-effect transition-colors duration-300">
+			<div class="max-w-[1400px] mx-auto px-6 h-16 flex items-center justify-between">
+				
+				<!-- Logo -->
+				<a href="/" class="flex items-center gap-2.5 group">
+					<!-- Geometric Math / Vercel-inspired Logo -->
+					<div class="relative w-7 h-7 flex items-center justify-center bg-ink text-canvas rounded-md overflow-hidden transition-all duration-300 group-hover:scale-105 border border-border-hairline-strong/20">
+						<span class="font-mono text-base font-bold select-none">Δ</span>
+					</div>
+					<span class="font-sans text-lg font-bold tracking-tight text-ink">
+						mental <span class="text-link-blue">mathit.</span>
+					</span>
+				</a>
+
+				<!-- Desktop Navigation -->
+				<nav class="hidden md:flex items-center gap-1.5" id="nav-links">
+					<a href="/sandbox" class="text-sm font-medium px-3 py-1.5 rounded-full text-body-text hover:text-ink hover:bg-canvas-soft-2 transition-colors duration-200" data-path="/sandbox">Sandbox</a>
+					<a href="/drill" class="text-sm font-medium px-3 py-1.5 rounded-full text-body-text hover:text-ink hover:bg-canvas-soft-2 transition-colors duration-200" data-path="/drill">Drill</a>
+					<a href="/metronome" class="text-sm font-medium px-3 py-1.5 rounded-full text-body-text hover:text-ink hover:bg-canvas-soft-2 transition-colors duration-200" data-path="/metronome">Metronome</a>
+					<a href="/blitz" class="text-sm font-medium px-3 py-1.5 rounded-full text-body-text hover:text-ink hover:bg-canvas-soft-2 transition-colors duration-200" data-path="/blitz">Blitz</a>
+					<a href="/tables" class="text-sm font-medium px-3 py-1.5 rounded-full text-body-text hover:text-ink hover:bg-canvas-soft-2 transition-colors duration-200" data-path="/tables">Tables</a>
+					<a href="/stats" class="text-sm font-medium px-3 py-1.5 rounded-full text-body-text hover:text-ink hover:bg-canvas-soft-2 transition-colors duration-200" data-path="/stats">Analytics</a>
+				</nav>
+
+				<!-- Controls / Right Cluster -->
+				<div class="flex items-center gap-3">
+					<!-- Theme Toggle Button -->
+					<button 
+						id="theme-toggle" 
+						aria-label="Toggle Theme"
+						class="w-9 h-9 flex items-center justify-center rounded-md border border-border-hairline bg-canvas hover:bg-canvas-soft-2 text-ink transition-colors duration-200 cursor-pointer shadow-vercel-sm"
+					>
+						<!-- Sun icon (shows in dark mode) -->
+						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4.5 h-4.5 hidden dark:block">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
+						</svg>
+						<!-- Moon icon (shows in light mode) -->
+						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-4.5 h-4.5 block dark:hidden">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
+						</svg>
+					</button>
+
+					<!-- Mobile Menu Button -->
+					<button 
+						id="mobile-menu-btn" 
+						aria-label="Toggle Mobile Menu"
+						class="md:hidden w-9 h-9 flex items-center justify-center rounded-md border border-border-hairline bg-canvas text-ink cursor-pointer hover:bg-canvas-soft-2 transition-colors duration-200"
+					>
+						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+							<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+						</svg>
+					</button>
+				</div>
+			</div>
+
+			<!-- Mobile Navigation Menu (Overlay) -->
+			<div id="mobile-menu" class="hidden md:hidden w-full border-t border-border-hairline bg-canvas flex-col py-4 px-6 gap-2">
+				<a href="/sandbox" class="text-sm font-medium py-2 text-body-text hover:text-ink block" data-path="/sandbox">Sandbox</a>
+				<a href="/drill" class="text-sm font-medium py-2 text-body-text hover:text-ink block" data-path="/drill">Drill</a>
+				<a href="/metronome" class="text-sm font-medium py-2 text-body-text hover:text-ink block" data-path="/metronome">Metronome</a>
+				<a href="/blitz" class="text-sm font-medium py-2 text-body-text hover:text-ink block" data-path="/blitz">Blitz</a>
+				<a href="/tables" class="text-sm font-medium py-2 text-body-text hover:text-ink block" data-path="/tables">Tables</a>
+				<a href="/stats" class="text-sm font-medium py-2 text-body-text hover:text-ink block" data-path="/stats">Analytics</a>
+			</div>
+		</header>
+
+		<!-- Main Workspace Area -->
+		<main class="flex-1 max-w-[1400px] w-full mx-auto px-6 py-10 relative z-10 flex flex-col justify-center">
+			<slot />
+		</main>
+
+		<!-- Footer -->
+		<footer class="w-full border-t border-border-hairline bg-canvas py-8 transition-colors duration-300 relative z-10">
+			<div class="max-w-[1400px] mx-auto px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+				<div class="flex items-center gap-2">
+					<span class="font-mono text-xs text-muted-text">mental mathit. © 2026</span>
+				</div>
+				<div class="flex gap-6">
+					<a href="/sandbox" class="text-xs font-mono text-muted-text hover:text-ink">sandbox</a>
+					<a href="/drill" class="text-xs font-mono text-muted-text hover:text-ink">drill</a>
+					<a href="/metronome" class="text-xs font-mono text-muted-text hover:text-ink">metronome</a>
+					<a href="/blitz" class="text-xs font-mono text-muted-text hover:text-ink">blitz</a>
+					<a href="/tables" class="text-xs font-mono text-muted-text hover:text-ink">tables</a>
+				</div>
+			</div>
+		</footer>
+
+		<!-- Navigation highlighting & Theme Logic Scripts -->
+		<script>
+			// 1. Highlight Active Nav Link
+			const currentPath = window.location.pathname;
+			const links = document.querySelectorAll('#nav-links a, #mobile-menu a');
+			links.forEach(link => {
+				const path = link.getAttribute('data-path');
+				if (path && (currentPath === path || currentPath.startsWith(path + '/'))) {
+					link.classList.remove('text-body-text', 'hover:text-ink', 'hover:bg-canvas-soft-2');
+					link.classList.add('text-ink', 'bg-canvas-soft-2');
+					if (link.parentElement.id === 'nav-links') {
+						link.classList.add('border-b-2', 'border-link-blue', 'rounded-b-none', 'rounded-t-md');
+					}
+				}
+			});
+
+			// 2. Mobile Menu Toggle
+			const mobileBtn = document.getElementById('mobile-menu-btn');
+			const mobileMenu = document.getElementById('mobile-menu');
+			if (mobileBtn && mobileMenu) {
+				mobileBtn.addEventListener('click', () => {
+					mobileMenu.classList.toggle('hidden');
+					mobileMenu.classList.toggle('flex');
+				});
+			}
+
+			// 3. Theme Toggle Logic
+			const toggleBtn = document.getElementById('theme-toggle');
+			if (toggleBtn) {
+				toggleBtn.addEventListener('click', () => {
+					const isDark = document.documentElement.classList.toggle('dark');
+					localStorage.setItem('theme', isDark ? 'dark' : 'light');
+				});
+			}
+		</script>
 	</body>
 </html>
-
-<style>
-	html,
-	body {
-		margin: 0;
-		width: 100%;
-		height: 100%;
-	}
-</style>
