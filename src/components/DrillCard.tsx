@@ -20,10 +20,36 @@ export default function DrillCard() {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('mm_tables_config');
       if (saved) {
-        try { return JSON.parse(saved); } catch (e) {}
+        try {
+          const parsed = JSON.parse(saved);
+          return {
+            minTable: 2,
+            maxTable: 20,
+            minMult: 1,
+            maxMult: 12,
+            only12to20: false,
+            missingFactor: false,
+            squaresMin: 1,
+            squaresMax: 100,
+            squaresType: 'mixed',
+            squaresStyle: 'mixed',
+            ...parsed
+          };
+        } catch (e) {}
       }
     }
-    return { minTable: 2, maxTable: 20, minMult: 1, maxMult: 12, only12to20: false, missingFactor: false };
+    return {
+      minTable: 2,
+      maxTable: 20,
+      minMult: 1,
+      maxMult: 12,
+      only12to20: false,
+      missingFactor: false,
+      squaresMin: 1,
+      squaresMax: 100,
+      squaresType: 'mixed',
+      squaresStyle: 'mixed'
+    };
   });
 
   const [arithmeticConfig, setArithmeticConfig] = useState<ArithmeticConfig>(() => {
@@ -58,6 +84,11 @@ export default function DrillCard() {
       minMult: isOnly12to20 ? 1 : newTables.minMult,
       maxMult: isOnly12to20 ? 10 : newTables.maxMult,
       missingFactor: !!newTables.missingFactor,
+      squaresMin: newTables.squaresMin ?? 1,
+      squaresMax: newTables.squaresMax ?? 100,
+      squaresType: newTables.squaresType ?? 'mixed',
+      squaresStyle: newTables.squaresStyle ?? 'mixed',
+      squaresFilters: newTables.squaresFilters ?? [],
       minVal: newArithmetic.minVal,
       maxVal: newArithmetic.maxVal,
       numTerms: newArithmetic.numTerms,
@@ -143,6 +174,7 @@ export default function DrillCard() {
     setSelectedCategory(cat);
     let defaultStrat = 'all';
     if (cat === 'tables') defaultStrat = 'mult_tables_10_20';
+    else if (cat === 'squares') defaultStrat = 'squares_range';
     else if (cat === 'addition') defaultStrat = 'add_split_recombine';
     else if (cat === 'subtraction') defaultStrat = 'sub_bridge_10';
     else if (cat === 'multiplication') defaultStrat = 'mult_near_base';
@@ -159,6 +191,30 @@ export default function DrillCard() {
       if (key === 'maxTable' && next.maxTable < next.minTable) next.minTable = next.maxTable;
       if (key === 'minMult' && next.minMult > next.maxMult) next.maxMult = next.minMult;
       if (key === 'maxMult' && next.maxMult < next.minMult) next.minMult = next.maxMult;
+      localStorage.setItem('mm_tables_config', JSON.stringify(next));
+      loadNewProblem(selectedStrategy, getMergedOptions(next, arithmeticConfig, bridgeConfig));
+      return next;
+    });
+  };
+
+  const handleSquaresConfigChange = (key: keyof TablesConfig, val: any) => {
+    setTablesConfig(prev => {
+      const next = { ...prev, [key]: val };
+      if (key === 'squaresMin' && next.squaresMin !== undefined && next.squaresMax !== undefined && next.squaresMin > next.squaresMax) next.squaresMax = next.squaresMin;
+      if (key === 'squaresMax' && next.squaresMin !== undefined && next.squaresMax !== undefined && next.squaresMax < next.squaresMin) next.squaresMin = next.squaresMax;
+      localStorage.setItem('mm_tables_config', JSON.stringify(next));
+      loadNewProblem(selectedStrategy, getMergedOptions(next, arithmeticConfig, bridgeConfig));
+      return next;
+    });
+  };
+
+  const toggleSquaresFilter = (filterId: string) => {
+    setTablesConfig(prev => {
+      const active = prev.squaresFilters ?? [];
+      const nextFilters = active.includes(filterId)
+        ? active.filter(f => f !== filterId)
+        : [...active, filterId];
+      const next = { ...prev, squaresFilters: nextFilters };
       localStorage.setItem('mm_tables_config', JSON.stringify(next));
       loadNewProblem(selectedStrategy, getMergedOptions(next, arithmeticConfig, bridgeConfig));
       return next;
@@ -270,6 +326,7 @@ export default function DrillCard() {
           { id: 'subtraction', label: 'Subtraction' },
           { id: 'multiplication', label: 'Multiplication' },
           { id: 'tables', label: 'Times Tables' },
+          { id: 'squares', label: 'Squares' },
           { id: 'custom', label: 'Custom' },
         ].map(cat => (
           <button
@@ -324,6 +381,9 @@ export default function DrillCard() {
             {selectedCategory === 'tables' && (
               <option value="mult_tables_10_20">Times Tables (1-20)</option>
             )}
+            {selectedCategory === 'squares' && (
+              <option value="squares_range">Squares (1-30)</option>
+            )}
             {selectedCategory === 'custom' && (
               <option value="add_sub_3_terms">Custom Arithmetic (Add/Sub)</option>
             )}
@@ -331,7 +391,7 @@ export default function DrillCard() {
           <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-muted-text text-[10px]">▼</div>
         </div>
 
-        {['sub_bridge_10', 'mult_tables_10_20', 'add_sub_3_terms'].includes(selectedStrategy) && (
+        {['sub_bridge_10', 'mult_tables_10_20', 'squares_range', 'add_sub_3_terms'].includes(selectedStrategy) && (
           <button
             onClick={() => setShowConfig(!showConfig)}
             className={`
@@ -351,7 +411,7 @@ export default function DrillCard() {
       </div>
 
       {/* Settings Panel */}
-      {showConfig && ['sub_bridge_10', 'mult_tables_10_20', 'add_sub_3_terms'].includes(selectedStrategy) && (
+      {showConfig && ['sub_bridge_10', 'mult_tables_10_20', 'squares_range', 'add_sub_3_terms'].includes(selectedStrategy) && (
         <div className="w-full max-w-md bg-canvas border border-border-hairline p-5 rounded-lg shadow-vercel-md flex flex-col gap-4 text-left transition-all duration-300">
           <h4 className="text-xs font-semibold tracking-wider text-muted-text uppercase">Configure Mode</h4>
           
@@ -509,6 +569,164 @@ export default function DrillCard() {
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {selectedStrategy === 'squares_range' && (
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-3">
+                {/* Question Type */}
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-medium text-body-text">Question Type</span>
+                  <div className="flex bg-canvas-soft border border-border-hairline rounded p-0.5">
+                    {(['square', 'base', 'mixed'] as const).map(t => (
+                      <button
+                        key={t}
+                        type="button"
+                        onClick={() => handleSquaresConfigChange('squaresType', t)}
+                        className={`px-2.5 py-1 text-[10px] font-mono rounded transition-all cursor-pointer ${tablesConfig.squaresType === t ? 'bg-ink text-canvas font-semibold' : 'text-muted-text hover:text-ink'}`}
+                      >
+                        {t === 'square' ? 'X²' : t === 'base' ? '√Y' : 'Mixed'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Question Style */}
+                <div className="flex items-center justify-between border-t border-border-hairline pt-3">
+                  <span className="text-xs font-medium text-body-text">Question Style</span>
+                  <div className="flex bg-canvas-soft border border-border-hairline rounded p-0.5">
+                    {(['word', 'equation', 'mixed'] as const).map(s => (
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => handleSquaresConfigChange('squaresStyle', s)}
+                        className={`px-2.5 py-1 text-[10px] font-mono rounded transition-all cursor-pointer ${tablesConfig.squaresStyle === s ? 'bg-ink text-canvas font-semibold' : 'text-muted-text hover:text-ink'}`}
+                      >
+                        {s === 'word' ? 'Word' : s === 'equation' ? 'Equation' : 'Mixed'}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                 {/* Base Range Selector */}
+                <div className="flex flex-col gap-1.5 border-t border-border-hairline pt-3">
+                  <div className="flex justify-between items-center">
+                    <label className="text-[11px] font-semibold text-body-text">Base Range</label>
+                    <div className="flex items-center gap-1 font-mono text-[10px]">
+                      <input
+                        type="number"
+                        min="1"
+                        max="100"
+                        value={tablesConfig.squaresMin ?? 1}
+                        onChange={e => handleSquaresConfigChange('squaresMin', Number(e.target.value))}
+                        className="w-10 px-1 py-0.5 bg-canvas-soft border border-border-hairline rounded text-center text-ink outline-none"
+                      />
+                      <span className="text-muted-text">to</span>
+                      <input
+                        type="number"
+                        min="1"
+                        max="100"
+                        value={tablesConfig.squaresMax ?? 100}
+                        onChange={e => handleSquaresConfigChange('squaresMax', Number(e.target.value))}
+                        className="w-10 px-1 py-0.5 bg-canvas-soft border border-border-hairline rounded text-center text-ink outline-none"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[9px] font-mono text-muted-text w-6 select-none">Min</span>
+                      <ScrollableNumberPicker
+                        min={1}
+                        max={100}
+                        value={tablesConfig.squaresMin ?? 1}
+                        onChange={val => handleSquaresConfigChange('squaresMin', val)}
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[9px] font-mono text-muted-text w-6 select-none">Max</span>
+                      <ScrollableNumberPicker
+                        min={1}
+                        max={100}
+                        value={tablesConfig.squaresMax ?? 100}
+                        onChange={val => handleSquaresConfigChange('squaresMax', val)}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Mental Math Filters */}
+                <div className="flex flex-col gap-2.5 border-t border-border-hairline pt-3 text-xs">
+                  <span className="font-mono text-[10px] uppercase font-bold text-muted-text block">Mental Math Filters (Union):</span>
+                  
+                  <div className="grid grid-cols-2 gap-2">
+                    <label className="flex items-center gap-2 cursor-pointer text-body-text select-none">
+                      <input
+                        type="checkbox"
+                        checked={(tablesConfig.squaresFilters ?? []).includes('ends_in_1')}
+                        onChange={() => toggleSquaresFilter('ends_in_1')}
+                        className="rounded border-border-hairline text-link-blue focus:ring-link-blue w-3.5 h-3.5"
+                      />
+                      <span>Ends in 1</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer text-body-text select-none">
+                      <input
+                        type="checkbox"
+                        checked={(tablesConfig.squaresFilters ?? []).includes('ends_in_5')}
+                        onChange={() => toggleSquaresFilter('ends_in_5')}
+                        className="rounded border-border-hairline text-link-blue focus:ring-link-blue w-3.5 h-3.5"
+                      />
+                      <span>Ends in 5</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer text-body-text select-none">
+                      <input
+                        type="checkbox"
+                        checked={(tablesConfig.squaresFilters ?? []).includes('same_digits')}
+                        onChange={() => toggleSquaresFilter('same_digits')}
+                        className="rounded border-border-hairline text-link-blue focus:ring-link-blue w-3.5 h-3.5"
+                      />
+                      <span>Same digits (11, 22...)</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer text-body-text select-none">
+                      <input
+                        type="checkbox"
+                        checked={(tablesConfig.squaresFilters ?? []).includes('multiples_of_10')}
+                        onChange={() => toggleSquaresFilter('multiples_of_10')}
+                        className="rounded border-border-hairline text-link-blue focus:ring-link-blue w-3.5 h-3.5"
+                      />
+                      <span>Multiples of 10</span>
+                    </label>
+                  </div>
+
+                  <div className="flex flex-col gap-1 border-t border-border-hairline/60 pt-2">
+                    <span className="font-mono text-[9px] text-muted-text block mb-1">Range Blocks (Decades):</span>
+                    <div className="grid grid-cols-2 gap-1.5 max-h-32 overflow-y-auto pr-1">
+                      {[
+                        { id: 'r_1_10', label: '1 - 10' },
+                        { id: 'r_11_20', label: '11 - 20' },
+                        { id: 'r_21_30', label: '21 - 30' },
+                        { id: 'r_31_40', label: '31 - 40' },
+                        { id: 'r_41_50', label: '41 - 50' },
+                        { id: 'r_51_60', label: '51 - 60' },
+                        { id: 'r_61_70', label: '61 - 70' },
+                        { id: 'r_71_80', label: '71 - 80' },
+                        { id: 'r_81_90', label: '81 - 90' },
+                        { id: 'r_91_100', label: '91 - 100' },
+                      ].map(decade => (
+                        <label key={decade.id} className="flex items-center gap-2 cursor-pointer text-body-text select-none text-[11px]">
+                          <input
+                            type="checkbox"
+                            checked={(tablesConfig.squaresFilters ?? []).includes(decade.id)}
+                            onChange={() => toggleSquaresFilter(decade.id)}
+                            className="rounded border-border-hairline text-link-blue focus:ring-link-blue w-3 h-3"
+                          />
+                          <span>{decade.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 

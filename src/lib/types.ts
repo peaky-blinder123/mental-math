@@ -17,6 +17,11 @@ export interface TablesConfig {
   maxMult: number;
   only12to20?: boolean;
   missingFactor?: boolean;
+  squaresMin?: number;
+  squaresMax?: number;
+  squaresType?: 'square' | 'base' | 'mixed';
+  squaresStyle?: 'word' | 'equation' | 'mixed';
+  squaresFilters?: string[];
 }
 
 export interface ArithmeticConfig {

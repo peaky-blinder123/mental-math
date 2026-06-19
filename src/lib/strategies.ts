@@ -29,6 +29,7 @@ export const STRATEGIES: StrategyInfo[] = [
   { id: 'mult_double_halve', label: 'Double-and-Halve' },
   { id: 'mult_teen_decomposition', label: 'Foundation Decomposition' },
   { id: 'mult_tables_10_20', label: 'Times Tables (1-20)' },
+  { id: 'squares_range', label: 'Squares' },
   { id: 'add_split_recombine', label: 'Split-and-Recombine' },
   { id: 'add_round_addend', label: 'Round-the-Addend' },
   { id: 'add_pair_ten_hundred', label: 'Pair-to-Ten / Pair-to-Hundred' },
@@ -50,6 +51,11 @@ export interface GenerationOptions {
   bridgeType?: 'ten' | 'hundred';
   maxDiff?: number;
   missingFactor?: boolean;
+  squaresMin?: number;
+  squaresMax?: number;
+  squaresType?: 'square' | 'base' | 'mixed';
+  squaresStyle?: 'word' | 'equation' | 'mixed';
+  squaresFilters?: string[];
 }
 
 export function generateProblem(strategyId: string, options?: GenerationOptions): Problem {
@@ -291,6 +297,99 @@ export function generateProblem(strategyId: string, options?: GenerationOptions)
           strategyLabel: 'Times Tables (1-20)',
           hint,
           problemText,
+        };
+      }
+
+      case 'squares_range': {
+        const minS = options?.squaresMin ?? 1;
+        const maxS = options?.squaresMax ?? 100;
+        
+        const activeFilters = options?.squaresFilters ?? [];
+        const possibleBases: number[] = [];
+        for (let i = minS; i <= maxS; i++) {
+          if (activeFilters.length === 0) {
+            possibleBases.push(i);
+          } else {
+            const matches = activeFilters.some(filter => {
+              if (filter === 'ends_in_1') return i % 10 === 1;
+              if (filter === 'ends_in_5') return i % 10 === 5;
+              if (filter === 'same_digits') return i >= 11 && i <= 99 && i % 11 === 0;
+              if (filter === 'multiples_of_10') return i % 10 === 0;
+              if (filter === 'r_1_10') return i >= 1 && i <= 10;
+              if (filter === 'r_11_20') return i >= 11 && i <= 20;
+              if (filter === 'r_21_30') return i >= 21 && i <= 30;
+              if (filter === 'r_31_40') return i >= 31 && i <= 40;
+              if (filter === 'r_41_50') return i >= 41 && i <= 50;
+              if (filter === 'r_51_60') return i >= 51 && i <= 60;
+              if (filter === 'r_61_70') return i >= 61 && i <= 70;
+              if (filter === 'r_71_80') return i >= 71 && i <= 80;
+              if (filter === 'r_81_90') return i >= 81 && i <= 90;
+              if (filter === 'r_91_100') return i >= 91 && i <= 100;
+              return false;
+            });
+            if (matches) possibleBases.push(i);
+          }
+        }
+
+        // Fallback if filters result in empty list
+        const finalBases = possibleBases.length > 0 ? possibleBases : Array.from({ length: maxS - minS + 1 }, (_, idx) => minS + idx);
+        
+        const N = finalBases[Math.floor(Math.random() * finalBases.length)];
+        const prod = N * N;
+
+        const sType = options?.squaresType ?? 'mixed';
+        const sStyle = options?.squaresStyle ?? 'mixed';
+
+        const activeType = sType === 'mixed'
+          ? (Math.random() < 0.5 ? 'square' : 'base')
+          : sType;
+
+        const activeStyle = sStyle === 'mixed'
+          ? (Math.random() < 0.5 ? 'word' : 'equation')
+          : sStyle;
+
+        let problemText = '';
+        let answer = 0;
+
+        if (activeType === 'square') {
+          answer = prod;
+          if (activeStyle === 'word') {
+            problemText = `What is square of ${N}?`;
+          } else {
+            problemText = `${N}² = ?`;
+          }
+        } else {
+          answer = N;
+          if (activeStyle === 'word') {
+            problemText = `Which number is square of ${prod}?`;
+          } else {
+            problemText = `?² = ${prod}`;
+          }
+        }
+
+        let hint = '';
+        if (N % 10 === 0) {
+          hint = `multiples of 10 squared: square the base (${N/10}² = ${(N/10)**2}), then append two zeros → ${prod}`;
+        } else if (N % 10 === 5) {
+          const tens = Math.floor(N / 10);
+          hint = `ends in 5: multiply the tens digit by the next integer (${tens} × ${tens + 1} = ${tens * (tens + 1)}), then append 25 → ${prod}`;
+        } else {
+          const nearest10 = Math.round(N / 10) * 10;
+          const d = Math.abs(N - nearest10);
+          const low = N - d;
+          const high = N + d;
+          hint = `difference formula: N² = (N - d)(N + d) + d² where d is distance to nearest 10 (${nearest10}). For ${N}, d = ${d} → (${N} - ${d}) × (${N} + ${d}) + ${d}² = ${low} × ${high} + ${d**2} = ${low * high} + ${d * d} = ${prod}`;
+        }
+
+        return {
+          operandA: N,
+          operandB: N,
+          operator: '*',
+          answer,
+          strategyId,
+          strategyLabel: `Squares (${minS}-${maxS})`,
+          hint,
+          problemText
         };
       }
 
