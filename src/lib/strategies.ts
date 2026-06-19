@@ -49,6 +49,7 @@ export interface GenerationOptions {
   subSigns?: string;
   bridgeType?: 'ten' | 'hundred';
   maxDiff?: number;
+  missingFactor?: boolean;
 }
 
 export function generateProblem(strategyId: string, options?: GenerationOptions): Problem {
@@ -274,14 +275,22 @@ export function generateProblem(strategyId: string, options?: GenerationOptions)
             : `${T} × ${N} → decompose: (10 × ${N}) + (${T - 10} × ${N}) = ${10 * N} + ${(T - 10) * N} = ${T * N}`;
         }
 
+        const isMissingFactor = !!options?.missingFactor;
+        const hideB = Math.random() < 0.5;
+        const problemText = isMissingFactor
+          ? (hideB ? `${operandA} × ? = ${T * N}` : `? × ${operandB} = ${T * N}`)
+          : undefined;
+        const answer = isMissingFactor ? (hideB ? operandB : operandA) : (T * N);
+
         return {
           operandA,
           operandB,
           operator: '*',
-          answer: T * N,
+          answer,
           strategyId,
           strategyLabel: 'Times Tables (1-20)',
           hint,
+          problemText,
         };
       }
 

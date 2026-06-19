@@ -16,6 +16,7 @@ export interface TablesConfig {
   minMult: number;
   maxMult: number;
   only12to20?: boolean;
+  missingFactor?: boolean;
 }
 
 export interface ArithmeticConfig {

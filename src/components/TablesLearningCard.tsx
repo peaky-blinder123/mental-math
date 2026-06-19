@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { generateProblem } from '../lib/strategies';
 import type { Problem } from '../lib/types';
 import { recordAttempt } from '../lib/tracking';
@@ -20,6 +20,7 @@ export default function TablesLearningCard() {
   const [drillStartTime, setDrillStartTime] = useState<number>(0);
   const [drillCount, setDrillCount] = useState<number>(0);
   const [drillCorrect, setDrillCorrect] = useState<number>(0);
+  const [missingFactor, setMissingFactor] = useState<boolean>(false);
 
   const getCellKey = (r: number, c: number) => `${r}-${c}`;
 
@@ -85,20 +86,33 @@ export default function TablesLearningCard() {
         : `${row} × ${mult} → decompose: (10 × ${mult}) + (${row - 10} × ${mult}) = ${10 * mult} + ${(row - 10) * mult} = ${row * mult}`;
     }
 
+    const hideB = Math.random() < 0.5;
+    const problemText = missingFactor
+      ? (hideB ? `${operandA} × ? = ${row * mult}` : `? × ${operandB} = ${row * mult}`)
+      : undefined;
+    const answer = missingFactor ? (hideB ? operandB : operandA) : (row * mult);
+
     setDrillProblem({
       operandA,
       operandB,
       operator: '*',
-      answer: row * mult,
+      answer,
       strategyId: 'mult_tables_10_20',
       strategyLabel: `Times Tables (${row}s)`,
-      hint
+      hint,
+      problemText
     });
     setDrillInput('');
     setDrillStatus('idle');
     setDrillHalted(false);
     setDrillStartTime(Date.now());
   };
+
+  useEffect(() => {
+    if (drillActive && drillRow) {
+      generateDrillProblem(drillRow);
+    }
+  }, [missingFactor]);
 
   const handleDrillInput = (val: string) => {
     if (drillHalted || !drillProblem) return;
@@ -258,10 +272,22 @@ export default function TablesLearningCard() {
             <span>Progress: {drillCorrect}/{drillCount}</span>
           </div>
 
+          {/* Missing Factor mode toggle inside the practice card */}
+          <div className="flex items-center justify-between w-full pb-3 border-b border-border-hairline/60 mb-2">
+            <span className="text-xs font-medium text-body-text">Missing Factor Mode (e.g. 12 × ? = 72)</span>
+            <button
+              type="button"
+              onClick={() => setMissingFactor(prev => !prev)}
+              className={`w-9 h-5 rounded-full p-0.5 transition-colors cursor-pointer ${missingFactor ? 'bg-link-blue' : 'bg-border-hairline-strong/30'}`}
+            >
+              <div className={`w-4 h-4 rounded-full bg-white transition-transform ${missingFactor ? 'translate-x-4' : 'translate-x-0'}`} />
+            </button>
+          </div>
+
           {drillProblem && (
             <div className="w-full flex flex-col items-center">
               <h3 className="text-4xl md:text-5xl font-sans font-bold text-ink py-6 select-none tabular-nums" id="current-problem-text">
-                {drillProblem.operandA} × {drillProblem.operandB}
+                {drillProblem.problemText ? drillProblem.problemText : `${drillProblem.operandA} × ${drillProblem.operandB}`}
               </h3>
 
               <form onSubmit={checkDrillAnswer} className="w-full flex flex-col items-center gap-4 mt-2">

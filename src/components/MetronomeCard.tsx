@@ -22,7 +22,7 @@ export default function MetronomeCard() {
         try { return JSON.parse(saved); } catch (e) {}
       }
     }
-    return { minTable: 2, maxTable: 20, minMult: 1, maxMult: 12, only12to20: false };
+    return { minTable: 2, maxTable: 20, minMult: 1, maxMult: 12, only12to20: false, missingFactor: false };
   });
 
   const [arithmeticConfig, setArithmeticConfig] = useState<ArithmeticConfig>(() => {
@@ -56,6 +56,7 @@ export default function MetronomeCard() {
       maxTable: isOnly12to20 ? 20 : newTables.maxTable,
       minMult: isOnly12to20 ? 1 : newTables.minMult,
       maxMult: isOnly12to20 ? 10 : newTables.maxMult,
+      missingFactor: !!newTables.missingFactor,
       minVal: newArithmetic.minVal,
       maxVal: newArithmetic.maxVal,
       numTerms: newArithmetic.numTerms,
@@ -224,7 +225,7 @@ export default function MetronomeCard() {
   };
 
   const handleConfigChange = (key: keyof TablesConfig, val: number) => {
-    if (key !== 'only12to20' && (isNaN(val) || val < 1)) return;
+    if (key !== 'only12to20' && key !== 'missingFactor' && (isNaN(val) || val < 1)) return;
     setTablesConfig(prev => {
       const next = { ...prev, [key]: val };
       if (key === 'minTable' && next.minTable > next.maxTable) next.maxTable = next.minTable;
@@ -396,17 +397,32 @@ export default function MetronomeCard() {
 
               {selectedStrategy === 'mult_tables_10_20' && (
                 <div className="flex flex-col gap-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-medium text-body-text">Focus 12-20 tables (x10)</span>
-                    <button
-                      onClick={() => {
-                        const nextVal = !tablesConfig.only12to20;
-                        handleConfigChange('only12to20', nextVal ? 1 : 0);
-                      }}
-                      className={`w-10 h-5.5 rounded-full p-0.5 transition-colors cursor-pointer ${tablesConfig.only12to20 ? 'bg-link-blue' : 'bg-border-hairline-strong/30'}`}
-                    >
-                      <div className={`w-4.5 h-4.5 rounded-full bg-white transition-transform ${tablesConfig.only12to20 ? 'translate-x-4.5' : 'translate-x-0'}`} />
-                    </button>
+                  <div className="flex flex-col gap-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-medium text-body-text">Focus 12-20 tables (x10)</span>
+                      <button
+                        onClick={() => {
+                          const nextVal = !tablesConfig.only12to20;
+                          handleConfigChange('only12to20', nextVal ? 1 : 0);
+                        }}
+                        className={`w-10 h-5.5 rounded-full p-0.5 transition-colors cursor-pointer ${tablesConfig.only12to20 ? 'bg-link-blue' : 'bg-border-hairline-strong/30'}`}
+                      >
+                        <div className={`w-4.5 h-4.5 rounded-full bg-white transition-transform ${tablesConfig.only12to20 ? 'translate-x-4.5' : 'translate-x-0'}`} />
+                      </button>
+                    </div>
+
+                    <div className="flex items-center justify-between border-t border-border-hairline pt-3">
+                      <span className="text-xs font-medium text-body-text">Missing Factor Mode (e.g. 12 × ? = 72)</span>
+                      <button
+                        onClick={() => {
+                          const nextVal = !tablesConfig.missingFactor;
+                          handleConfigChange('missingFactor', nextVal ? 1 : 0);
+                        }}
+                        className={`w-10 h-5.5 rounded-full p-0.5 transition-colors cursor-pointer ${tablesConfig.missingFactor ? 'bg-link-blue' : 'bg-border-hairline-strong/30'}`}
+                      >
+                        <div className={`w-4.5 h-4.5 rounded-full bg-white transition-transform ${tablesConfig.missingFactor ? 'translate-x-4.5' : 'translate-x-0'}`} />
+                      </button>
+                    </div>
                   </div>
 
                   {!tablesConfig.only12to20 && (
