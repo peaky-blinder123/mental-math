@@ -3,6 +3,7 @@ import { generateProblem, STRATEGIES } from '../lib/strategies';
 import type { Problem, TablesConfig, ArithmeticConfig, BridgeConfig } from '../lib/types';
 import { recordAttempt } from '../lib/tracking';
 import NumPad from './NumPad';
+import ScrollableNumberPicker from './ScrollableNumberPicker';
 
 type GameState = 'idle' | 'running' | 'gameover';
 
@@ -485,55 +486,101 @@ export default function BlitzCard() {
                         }}
                         className={`w-10 h-5.5 rounded-full p-0.5 transition-colors cursor-pointer ${tablesConfig.missingFactor ? 'bg-link-blue' : 'bg-border-hairline-strong/30'}`}
                       >
-                        <div className={`w-4.5 h-4.5 rounded-full bg-white transition-transform ${tablesConfig.missingFactor ? 'translate-x-4.5' : 'translate-x-0'}`} />
                       </button>
                     </div>
                   </div>
 
                   {!tablesConfig.only12to20 && (
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="flex flex-col gap-1">
-                        <label className="text-[11px] font-medium text-muted-text">Table Range</label>
-                        <div className="flex items-center gap-1.5">
-                          <input
-                            type="number"
-                            min="2"
-                            max="99"
-                            value={tablesConfig.minTable}
-                            onChange={e => handleConfigChange('minTable', Number(e.target.value))}
-                            className="w-full px-2 py-1 bg-canvas-soft border border-border-hairline rounded text-sm text-center"
-                          />
-                          <span className="text-xs text-muted-text">to</span>
-                          <input
-                            type="number"
-                            min="2"
-                            max="99"
-                            value={tablesConfig.maxTable}
-                            onChange={e => handleConfigChange('maxTable', Number(e.target.value))}
-                            className="w-full px-2 py-1 bg-canvas-soft border border-border-hairline rounded text-sm text-center"
-                          />
+                    <div className="flex flex-col gap-3">
+                      {/* Table Range */}
+                      <div className="flex flex-col gap-1.5">
+                        <div className="flex justify-between items-center">
+                          <label className="text-[11px] font-semibold text-body-text">Table Range</label>
+                          <div className="flex items-center gap-1 font-mono text-[10px]">
+                            <input
+                              type="number"
+                              min="2"
+                              max="99"
+                              value={tablesConfig.minTable}
+                              onChange={e => handleConfigChange('minTable', Number(e.target.value))}
+                              className="w-10 px-1 py-0.5 bg-canvas-soft border border-border-hairline rounded text-center text-ink outline-none"
+                            />
+                            <span className="text-muted-text">to</span>
+                            <input
+                              type="number"
+                              min="2"
+                              max="99"
+                              value={tablesConfig.maxTable}
+                              onChange={e => handleConfigChange('maxTable', Number(e.target.value))}
+                              className="w-10 px-1 py-0.5 bg-canvas-soft border border-border-hairline rounded text-center text-ink outline-none"
+                            />
+                          </div>
+                        </div>
+                        <div className="flex flex-col gap-1.5">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[9px] font-mono text-muted-text w-6 select-none">Min</span>
+                            <ScrollableNumberPicker
+                              min={2}
+                              max={99}
+                              value={tablesConfig.minTable}
+                              onChange={val => handleConfigChange('minTable', val)}
+                            />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[9px] font-mono text-muted-text w-6 select-none">Max</span>
+                            <ScrollableNumberPicker
+                              min={2}
+                              max={99}
+                              value={tablesConfig.maxTable}
+                              onChange={val => handleConfigChange('maxTable', val)}
+                            />
+                          </div>
                         </div>
                       </div>
-                      <div className="flex flex-col gap-1">
-                        <label className="text-[11px] font-medium text-muted-text">Multiplier Range</label>
-                        <div className="flex items-center gap-1.5">
-                          <input
-                            type="number"
-                            min="1"
-                            max="99"
-                            value={tablesConfig.minMult}
-                            onChange={e => handleConfigChange('minMult', Number(e.target.value))}
-                            className="w-full px-2 py-1 bg-canvas-soft border border-border-hairline rounded text-sm text-center"
-                          />
-                          <span className="text-xs text-muted-text">to</span>
-                          <input
-                            type="number"
-                            min="1"
-                            max="99"
-                            value={tablesConfig.maxMult}
-                            onChange={e => handleConfigChange('maxMult', Number(e.target.value))}
-                            className="w-full px-2 py-1 bg-canvas-soft border border-border-hairline rounded text-sm text-center"
-                          />
+
+                      {/* Multiplier Range */}
+                      <div className="flex flex-col gap-1.5 border-t border-border-hairline pt-3">
+                        <div className="flex justify-between items-center">
+                          <label className="text-[11px] font-semibold text-body-text">Multiplier Range</label>
+                          <div className="flex items-center gap-1 font-mono text-[10px]">
+                            <input
+                              type="number"
+                              min="1"
+                              max="99"
+                              value={tablesConfig.minMult}
+                              onChange={e => handleConfigChange('minMult', Number(e.target.value))}
+                              className="w-10 px-1 py-0.5 bg-canvas-soft border border-border-hairline rounded text-center text-ink outline-none"
+                            />
+                            <span className="text-muted-text">to</span>
+                            <input
+                              type="number"
+                              min="1"
+                              max="99"
+                              value={tablesConfig.maxMult}
+                              onChange={e => handleConfigChange('maxMult', Number(e.target.value))}
+                              className="w-10 px-1 py-0.5 bg-canvas-soft border border-border-hairline rounded text-center text-ink outline-none"
+                            />
+                          </div>
+                        </div>
+                        <div className="flex flex-col gap-1.5">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[9px] font-mono text-muted-text w-6 select-none">Min</span>
+                            <ScrollableNumberPicker
+                              min={1}
+                              max={99}
+                              value={tablesConfig.minMult}
+                              onChange={val => handleConfigChange('minMult', val)}
+                            />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[9px] font-mono text-muted-text w-6 select-none">Max</span>
+                            <ScrollableNumberPicker
+                              min={1}
+                              max={99}
+                              value={tablesConfig.maxMult}
+                              onChange={val => handleConfigChange('maxMult', val)}
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -542,44 +589,66 @@ export default function BlitzCard() {
               )}
 
               {selectedStrategy === 'add_sub_3_terms' && (
-                <div className="flex flex-col gap-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="flex flex-col gap-1.5">
-                      <label className="text-xs font-medium text-body-text">Number Range</label>
-                      <div className="flex items-center gap-1.5">
+                <div className="flex flex-col gap-3">
+                  {/* Number Range */}
+                  <div className="flex flex-col gap-1.5">
+                    <div className="flex justify-between items-center">
+                      <label className="text-[11px] font-semibold text-body-text">Number Range</label>
+                      <div className="flex items-center gap-1 font-mono text-[10px]">
                         <input
                           type="number"
                           min="1"
                           max="999"
                           value={arithmeticConfig.minVal}
                           onChange={e => handleArithmeticConfigChange('minVal', Number(e.target.value))}
-                          className="w-full px-2 py-1 bg-canvas-soft border border-border-hairline rounded text-sm text-center"
+                          className="w-12 px-1 py-0.5 bg-canvas-soft border border-border-hairline rounded text-center text-ink outline-none"
                         />
-                        <span className="text-xs text-muted-text">to</span>
+                        <span className="text-muted-text">to</span>
                         <input
                           type="number"
                           min="1"
                           max="999"
                           value={arithmeticConfig.maxVal}
                           onChange={e => handleArithmeticConfigChange('maxVal', Number(e.target.value))}
-                          className="w-full px-2 py-1 bg-canvas-soft border border-border-hairline rounded text-sm text-center"
+                          className="w-12 px-1 py-0.5 bg-canvas-soft border border-border-hairline rounded text-center text-ink outline-none"
                         />
                       </div>
                     </div>
-                    
                     <div className="flex flex-col gap-1.5">
-                      <label className="text-xs font-medium text-body-text">Terms</label>
-                      <select
-                        value={arithmeticConfig.numTerms}
-                        onChange={e => handleArithmeticConfigChange('numTerms', Number(e.target.value))}
-                        className="w-full px-3 py-1.5 bg-canvas-soft border border-border-hairline rounded text-sm outline-none"
-                      >
-                        <option value="2">2 terms</option>
-                        <option value="3">3 terms</option>
-                        <option value="4">4 terms</option>
-                        <option value="5">5 terms</option>
-                      </select>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[9px] font-mono text-muted-text w-6 select-none">Min</span>
+                        <ScrollableNumberPicker
+                          min={1}
+                          max={500}
+                          value={arithmeticConfig.minVal}
+                          onChange={val => handleArithmeticConfigChange('minVal', val)}
+                        />
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[9px] font-mono text-muted-text w-6 select-none">Max</span>
+                        <ScrollableNumberPicker
+                          min={1}
+                          max={999}
+                          value={arithmeticConfig.maxVal}
+                          onChange={val => handleArithmeticConfigChange('maxVal', val)}
+                        />
+                      </div>
                     </div>
+                  </div>
+
+                  {/* Terms Selection */}
+                  <div className="flex flex-col gap-1.5 border-t border-border-hairline pt-3">
+                    <label className="text-xs font-medium text-body-text">Terms</label>
+                    <select
+                      value={arithmeticConfig.numTerms}
+                      onChange={e => handleArithmeticConfigChange('numTerms', Number(e.target.value))}
+                      className="w-full px-3 py-1.5 bg-canvas-soft border border-border-hairline rounded text-sm outline-none"
+                    >
+                      <option value="2">2 terms</option>
+                      <option value="3">3 terms</option>
+                      <option value="4">4 terms</option>
+                      <option value="5">5 terms</option>
+                    </select>
                   </div>
 
                   <div className="flex flex-col gap-1.5">
